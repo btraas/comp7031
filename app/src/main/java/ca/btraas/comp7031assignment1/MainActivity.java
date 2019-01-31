@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,12 +20,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Date;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -57,18 +61,25 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
             public void onClick(View v) {
                 autoRunning = false;
                 ((ImageView)MainActivity.this.findViewById(R.id.imageView)).setImageBitmap(library.getNext(true));
+                File file = library.getFileFromPath(library.currentPath);
+                Date lastModDate = new Date(file.lastModified());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    ((TextView)findViewById(R.id.timestamp)).setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(lastModDate));
+                }
             }
         });
 
-        ((Button)findViewById(R.id.upload)).setOnClickListener(new Button.OnClickListener() {
+//        ((Button)findViewById(R.id.upload)).setOnClickListener(new Button.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//                UploadTask task = new UploadTask(MainActivity.this);
+//                task.execute(library.getFileFromPath(library.currentPath));
+//
+//            }
+//        });
 
-            @Override
-            public void onClick(View v) {
-                UploadTask task = new UploadTask(MainActivity.this);
-                task.execute(library.getFileFromPath(library.currentPath));
-
-            }
-        });
+        getSupportActionBar().setTitle("COMP 7082 Photo Gallery");
     }
 
 
@@ -124,49 +135,62 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
     @Override
     public void onClick(View v) {
         autoRunning = false;
-        ((ImageView)MainActivity.this.findViewById(R.id.imageView)).setImageBitmap(library.getNext(false));
+        Bitmap bmp = library.getNext(false);
+        ((ImageView)MainActivity.this.findViewById(R.id.imageView)).setImageBitmap(bmp);
+        File file = library.getFileFromPath(library.currentPath);
+        Date lastModDate = new Date(file.lastModified());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            ((TextView)findViewById(R.id.timestamp)).setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(lastModDate));
+        }
+//        Log.i("File last modified @ : "+ lastModDate.toString());
+
     }
 
 
 
-    public void auto(View view) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                autoRunning = true;
-                MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((Button)MainActivity.this.findViewById(R.id.auto)).setEnabled(false);
-                    }
-                });
-                while(autoRunning) {
-                    MainActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ((ImageView)MainActivity.this.findViewById(R.id.imageView)).setImageBitmap(library.getNext(true));
-                        }
-                    });
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((Button)MainActivity.this.findViewById(R.id.auto)).setEnabled(true);
-                    }
-                });
-
-            }
-        }).start();
-    }
+//    public void auto(View view) {
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                autoRunning = true;
+//                MainActivity.this.runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        ((Button)MainActivity.this.findViewById(R.id.auto)).setEnabled(false);
+//                    }
+//                });
+//                while(autoRunning) {
+//                    MainActivity.this.runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            ((ImageView)MainActivity.this.findViewById(R.id.imageView)).setImageBitmap(library.getNext(true));
+//                        }
+//                    });
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                MainActivity.this.runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        ((Button)MainActivity.this.findViewById(R.id.auto)).setEnabled(true);
+//                    }
+//                });
+//
+//            }
+//        }).start();
+//    }
 
     public void swtch(View view) {
         Intent myIntent = new Intent(MainActivity.this, CanvasActivity.class);
         myIntent.putExtra("photo_path", library.currentPath == null ? "" : library.currentPath); //Optional parameters
+        MainActivity.this.startActivityForResult(myIntent, REQUEST_CODE_CURRENT_PATH);
+    }
+
+    public void search(View view) {
+        Intent myIntent = new Intent(MainActivity.this, SearchActivity.class);
         MainActivity.this.startActivityForResult(myIntent, REQUEST_CODE_CURRENT_PATH);
     }
 
@@ -181,6 +205,11 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
                 autoRunning = false;
                 ((ImageView)MainActivity.this.findViewById(R.id.imageView)).setImageBitmap(current);
+                File file = library.getFileFromPath(library.currentPath);
+                Date lastModDate = new Date(file.lastModified());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    ((TextView)findViewById(R.id.timestamp)).setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(lastModDate));
+                }
 
 
             }
