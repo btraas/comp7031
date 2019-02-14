@@ -51,25 +51,26 @@ public class MyApplicationEspressoTest {
     public void ensureKeywordSearchWorks() {
         onView(withId(R.id.search)).perform(click());
 
-        onView(withId(R.id.search_tag)).perform(typeText("PC"), closeSoftKeyboard());
+        onView(withId(R.id.search_tag)).perform(typeText("he"), closeSoftKeyboard());
         onView(withId(R.id.search_search)).perform(click());
-        for (int i = 0; i <= 5; i++) {
-            onView(withId(R.id.left)).perform(click());
-        }
+//        for (int i = 0; i <= 5; i++) {
+//            onView(withId(R.id.left)).perform(click());
+//        }
     }
 
     @Test
     public void ensureDateSearchWorks() {
         onView(withId(R.id.search)).perform(click());
 
-        onView(withId(R.id.search_toDate)).perform(typeText("2018-12-01"), closeSoftKeyboard());
-        onView(withId(R.id.search_fromDate)).perform(typeText("2018-12-31"), closeSoftKeyboard());
+        onView(withId(R.id.search_fromDate)).perform(typeText("2019-02-01"), closeSoftKeyboard());
+        onView(withId(R.id.search_toDate)).perform(typeText("2019-02-10"), closeSoftKeyboard());
         onView(withId(R.id.search_search)).perform(click());
 
 
-        for (int i = 0; i <= 5; i++) {
-            onView(withId(R.id.left)).perform(click());
-        }
+
+//        for (int i = 0; i <= 5; i++) {
+//            onView(withId(R.id.left)).perform(click());
+//        }
 
         //onView(withContentDescription("Navigate up")).perform(click());
     }

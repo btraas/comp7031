@@ -87,8 +87,13 @@
         android:id="@+id/timestamp"
         app:layout_constraintTop_toBottomOf="@id/search"/>
     <EditText
-        android:layout_width="100dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/search"
         android:id="@+id/caption" />
+    <TextView
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/caption"
+        android:id="@+id/location" />
 </android.support.constraint.ConstraintLayout>
