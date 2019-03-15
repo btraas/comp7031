@@ -23,7 +23,7 @@
         android:layout_below="@+id/title_search"
         android:layout_alignRight="@+id/title_search"
         android:layout_alignEnd="@+id/title_search"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="0dp"
         android:id="@+id/search_fromDate" />
 
     <TextView
@@ -33,7 +33,7 @@
         android:layout_alignBottom="@+id/search_fromDate"
         android:layout_alignLeft="@+id/title_search"
         android:layout_alignStart="@+id/title_search"
-        android:layout_marginBottom="11dp"
+        android:layout_marginBottom="23dp"
         android:id="@+id/search_fromDateLabel" />
 
     <EditText
@@ -44,7 +44,7 @@
         android:layout_below="@+id/search_fromDate"
         android:layout_alignRight="@+id/search_fromDate"
         android:layout_alignEnd="@+id/search_fromDate"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="0dp"
         android:id="@+id/search_toDate" />
 
     <TextView
@@ -54,7 +54,7 @@
         android:layout_alignTop="@+id/search_toDate"
         android:layout_alignLeft="@+id/search_fromDateLabel"
         android:layout_alignStart="@+id/search_fromDateLabel"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="23dp"
         android:id="@+id/search_toDateLabel" />
 
 
@@ -66,7 +66,7 @@
         android:layout_below="@+id/search_toDate"
         android:layout_alignRight="@+id/search_fromDate"
         android:layout_alignEnd="@+id/search_fromDate"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         android:id="@+id/search_tag" />
 
     <TextView
@@ -76,8 +76,81 @@
         android:layout_alignTop="@+id/search_tag"
         android:layout_alignLeft="@+id/search_fromDateLabel"
         android:layout_alignStart="@+id/search_fromDateLabel"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="18dp"
         android:id="@+id/search_tagLabel" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:ems="10"
+        android:layout_below="@+id/search_tag"
+        android:layout_alignRight="@+id/search_fromDate"
+        android:layout_alignEnd="@+id/search_fromDate"
+        android:layout_marginTop="50dp"
+        android:id="@+id/search_lat" />
+    <TextView
+        android:text="Search Lat: "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/search_lat"
+        android:layout_alignLeft="@+id/search_fromDateLabel"
+        android:layout_alignStart="@+id/search_fromDateLabel"
+        android:layout_marginTop="18dp"
+        android:id="@+id/search_latLabel" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:ems="10"
+        android:layout_below="@+id/search_lat"
+        android:layout_alignRight="@+id/search_fromDate"
+        android:layout_alignEnd="@+id/search_fromDate"
+        android:layout_marginTop="10dp"
+        android:id="@+id/search_lon" />
+    <TextView
+        android:text="Search Long: "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/search_lon"
+        android:layout_alignLeft="@+id/search_fromDateLabel"
+        android:layout_alignStart="@+id/search_fromDateLabel"
+        android:layout_marginTop="18dp"
+        android:id="@+id/search_lonLabel" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:ems="10"
+        android:layout_below="@+id/search_lon"
+        android:layout_alignRight="@+id/search_fromDate"
+        android:layout_alignEnd="@+id/search_fromDate"
+        android:layout_marginTop="10dp"
+        android:id="@+id/search_auto" />
+    <TextView
+        android:text="Search Auto: "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/search_auto"
+        android:layout_alignLeft="@+id/search_fromDateLabel"
+        android:layout_alignStart="@+id/search_fromDateLabel"
+        android:layout_marginTop="18dp"
+        android:id="@+id/search_autoLabel" />
+
+
+    <Button
+        android:text="Voice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_autoLabel"
+        android:layout_alignRight="@+id/search_fromDateLabel"
+        android:layout_alignEnd="@+id/search_fromDateLabel"
+        android:layout_marginTop="18dp"
+
+        android:id="@+id/search_voice"
+        android:onClick="voice" />
 
 
     <Button

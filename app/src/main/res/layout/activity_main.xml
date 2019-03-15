@@ -27,6 +27,18 @@
         />
 
     <Button
+        android:id="@+id/delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Delete"
+        android:backgroundTint="@android:color/holo_red_dark"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/left"
+        android:onClick="delete"
+        />
+
+    <Button
         android:id="@+id/snap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -49,17 +61,17 @@
         <!--/>-->
 
 
-    <!--<Button-->
-        <!--android:id="@+id/auto"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:onClick="auto"-->
+    <Button
+        android:id="@+id/auto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="auto"
 
-        <!--android:text="Auto"-->
+        android:text="Describe"
 
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintTop_toBottomOf="@id/snap" />-->
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/snap" />
 
     <Button
         android:id="@+id/right"

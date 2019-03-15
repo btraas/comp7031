@@ -7,19 +7,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.icu.text.SimpleDateFormat;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -37,22 +33,20 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
-import javax.net.ssl.HttpsURLConnection;
+import ca.btraas.comp7031assignment1.lib.ImageLibrary;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 public class MainActivity extends AppCompatActivity implements Button.OnClickListener {
 
     public static final int CAMERA_REQUEST = 1888;
-
     public static Location location = null;
 
+    TextToSpeech tts;
 
     String mCapturePhotoPath;
     ImageLibrary library;
@@ -79,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                             @Override
                             public void onLocationChanged(Location location) {
                                 MainActivity.location = location;
-
                             }
 
                             @Override
@@ -118,6 +111,25 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 50);
         }
 
+
+        tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int result = tts.setLanguage(Locale.CANADA);
+                    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Toast.makeText(getApplicationContext(), "English TTS is not supported", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "TTS Initialization Failed!", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+
+
+
+
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         try {
@@ -143,7 +155,9 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
             e.printStackTrace();
         }
 
-        library = new ImageLibrary(this, null);
+        // will load the first file into library.currentPath
+        library = new ImageLibrary(this, null, null);
+        setImageFromPath(library.currentPath); // draw on imageView
 
         ((Button) findViewById(R.id.left)).setOnClickListener(this);
         ((Button) findViewById(R.id.right)).setOnClickListener(new Button.OnClickListener() {
@@ -174,47 +188,13 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                 String newCaption = s.toString();
 
                 if(library.getFileFromPath(library.currentPath) == null) return;
-                library.setCaption(MainActivity.this, newCaption);
+                library.setCaption(library.currentPath, newCaption);
 
             }
         });
 
-//        ((Button)findViewById(R.id.upload)).setOnClickListener(new Button.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//                UploadTask task = new UploadTask(MainActivity.this);
-//                task.execute(library.getFileFromPath(library.currentPath));
-//
-//            }
-//        });
 
         getSupportActionBar().setTitle("COMP 7082 Photo Gallery");
-    }
-
-
-    /**
-     * Before actually capturing an image.
-     *
-     * @return
-     * @throws IOException
-     */
-    public File createImageFile() throws IOException {
-
-
-        String locationName = (MainActivity.location == null ? "UnknownLocation" :
-                MainActivity.location.getLatitude() + "N" +
-                        MainActivity.location.getLongitude() + "W");
-
-
-        // Create an image file name
-//        String imageFileName = "7031_" + System.currentTimeMillis() + "_";
-        File storageDir = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile("." + locationName + ".", ".jpg", storageDir);
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCapturePhotoPath = image.getAbsolutePath();
-        return image;
     }
 
 
@@ -226,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
         if (cameraIntent.resolveActivity(this.getPackageManager()) != null) {
             try {
-                File photoFile = this.createImageFile();
+                File photoFile = library.createImageFile(MainActivity.location);
                 library.currentPath = photoFile.getAbsolutePath();
 
                 Uri uri = FileProvider.getUriForFile(this, "ca.btraas.comp7031assignment1.fileprovider", photoFile);
@@ -242,13 +222,6 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
         }
 
-
-//        Intent intent = new Intent();
-//        intent.setType("image/*");
-//        intent.setAction(Intent.ACTION_GET_CONTENT);
-//        startActivityForResult(this, Intent.createChooser(intent, "Select Picture"));
-//
-//
     }
 
     @Override
@@ -261,82 +234,59 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
     }
 
     void setImageFromPath(String path) {
+        Log.d("MainActivity", "setImageFromPath: " + path);
+
+        ImageView imageView = ((ImageView) MainActivity.this.findViewById(R.id.imageView));
+        EditText captionView = ((EditText) findViewById(R.id.caption));
+        TextView timestampView = ((TextView) findViewById(R.id.timestamp));
+        TextView locationView = ((TextView) findViewById(R.id.location));
+
+
         if(path == null || path.equals("")) {
-            System.out.println(path);
+            Log.d("MainActivity", "setImageFromPath: path is empty. clearing...");
+            imageView.setImageBitmap(null);
+            imageView.setVisibility(View.INVISIBLE);
+            captionView.setText("");
+            timestampView.setText("no image");
+            locationView.setText("");
+            return;
         }
+        imageView.setVisibility(View.VISIBLE);
+
         Log.d("MainActivity", "setImageFromPath: " + path);
         library.currentPath = path;
 
         Bitmap bmp = library.getBitmapFromPath(path);
-        ((ImageView) MainActivity.this.findViewById(R.id.imageView)).setImageBitmap(bmp);
+        imageView.setImageBitmap(bmp);
+
         File file = library.getFileFromPath(library.currentPath);
         if (file == null) {
             Log.w("MainActivity", "file not found!");
         } else {
-
             Date lastModDate = new Date(file.lastModified());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                ((TextView) findViewById(R.id.timestamp)).setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(lastModDate));
+                timestampView.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(lastModDate));
             }
         }
-        ((EditText) findViewById(R.id.caption)).setText(library.getCaption(MainActivity.this, library.currentPath));
+        captionView.setText(library.getCaption( library.currentPath ));
 
-        String locationString = library.getLocationString(MainActivity.this, library.currentPath);
-        if(locationString.equals("") || locationString.toLowerCase().equals("no location") || locationString.toLowerCase().equals("nolocation")) {
+        String locationString = library.getLocationString( library.currentPath );
+
+        // set location now if not set already.
+        if(locationString.equals("") || locationString.toLowerCase().contains("no location") || locationString.toLowerCase().contains("nolocation")) {
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             @SuppressLint("MissingPermission") Location loc = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             try {
-                library.setLocation(MainActivity.this, loc);
+                library.setLocation(library.currentPath, loc);
 
             } catch(RuntimeException e) {
                 e.printStackTrace();
             }
         }
 
-        ((TextView) findViewById(R.id.location)).setText(library.getLocationString(MainActivity.this, library.currentPath));
+        locationView.setText(library.getLocationString( library.currentPath ));
     }
 
-
-//    public void auto(View view) {
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                autoRunning = true;
-//                MainActivity.this.runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        ((Button)MainActivity.this.findViewById(R.id.auto)).setEnabled(false);
-//                    }
-//                });
-//                while(autoRunning) {
-//                    MainActivity.this.runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            ((ImageView)MainActivity.this.findViewById(R.id.imageView)).setImageBitmap(library.getNext(true));
-//                        }
-//                    });
-//                    try {
-//                        Thread.sleep(1000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//                MainActivity.this.runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        ((Button)MainActivity.this.findViewById(R.id.auto)).setEnabled(true);
-//                    }
-//                });
-//
-//            }
-//        }).start();
-//    }
-
-    public void swtch(View view) {
-        Intent myIntent = new Intent(MainActivity.this, CanvasActivity.class);
-        myIntent.putExtra("photo_path", library.currentPath == null ? "" : library.currentPath); //Optional parameters
-        MainActivity.this.startActivityForResult(myIntent, REQUEST_CODE_CURRENT_PATH);
-    }
 
     public void search(View view) {
         Intent myIntent = new Intent(MainActivity.this, SearchActivity.class);
@@ -357,14 +307,10 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                 autoRunning = false;
                 setImageFromPath(result);
 
-                final Uri originalUri = data.getData();
-                library.setLocationFromExif(this, originalUri, result);
-
-
+            } else {
+                setImageFromPath(null);
             }
-            if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
-            }
+
         } else { // camera capture ??
             if (resultCode != Activity.RESULT_OK) {
                 return;
@@ -372,8 +318,100 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
             setImageFromPath(library.currentPath);
 
 
-
-
         }
     }//onActivityResult
+
+    public void delete(View view) {
+        if(library.deleteFile(library.currentPath)) {
+            Toast.makeText(MainActivity.this, "Photo deleted!", Toast.LENGTH_SHORT).show();
+            library.getNext(true);
+            setImageFromPath(library.currentPath);
+        } else {
+            Toast.makeText(MainActivity.this, "Failed to delete photo!", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void auto(View view) {
+//        String[] bottleLabels = new String[]{
+//                "Plastic Bottle",
+//                "Bottle",
+//                "Water",
+//                "Water Bottle",
+//                "Bottled Water",
+//                "Drinking Water",
+//                "Mineral Water",
+//                "Distilled Water",
+//                "Two-liter Bottle",
+//                "Enhanced Water",
+//                "Drinkware",
+//                "Liquid"
+//        };
+//        String[] mbp = new String[]{
+//                "Space Bar",
+//                "Computer Keyboard",
+//                "Office Equipment",
+//                "Text",
+//                "Electronic Device",
+//                "Technology",
+//                "Laptop",
+//                "Computer",
+//                "Font",
+//                "Input Device",
+//                "Touchpad"
+//        };
+//        String[] mbpDoc = new String[]{
+//                "command",
+//                "MacBook Pro",
+//                "String"
+//        };
+//        library.setVisionAnnotationLabels(library.currentPath, mbp);
+//        library.setVisionDocumentLabels(library.currentPath, mbpDoc);
+
+
+//        Toast.makeText(this, library.getVisionAnnotationLabels(library.currentPath)[1], Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, library.getVisionDocumentLabels(library.currentPath)[1], Toast.LENGTH_LONG).show();
+
+        String[] annLabels = library.getVisionAnnotationLabels(library.currentPath);
+        if(annLabels.length > 0) {
+            String[] prefix = new String[]{
+                    "This photo may contain:",
+                    "This photo has:",
+                    "I found:",
+                    "Here's what I see:"
+            };
+            tts.speak(prefix[new Random().nextInt(prefix.length)], TextToSpeech.QUEUE_ADD, null);
+        }
+        int count = 0;
+        for(String annotation: annLabels) {
+            count++;
+            if(count > 3) break;
+            tts.speak( ((count == 3 || count == annLabels.length) ? "and " : "") +
+                    (annotation.startsWith("a")
+                || annotation.startsWith("e")
+                || annotation.startsWith("i")
+                || annotation.startsWith("o")
+                || annotation.startsWith("u") ? "an " : "a ") + annotation, TextToSpeech.QUEUE_ADD, null);
+
+        }
+
+        String[] annDoc = library.getVisionDocumentLabels(library.currentPath);
+        if(annDoc.length > 0) {
+            tts.speak("Also, here's some text I found in the image: ", TextToSpeech.QUEUE_ADD, null);
+        }
+        count = 0;
+        for(String annotation: annDoc) {
+            count++;
+            if(count > 3) break;
+            tts.speak( ((count == 3 || count == annDoc.length) ? "and " : ", ") +
+                    annotation, TextToSpeech.QUEUE_ADD, null);
+
+        }
+
+        if(annLabels.length == 0 && annDoc.length == 0) {
+            tts.speak("I found no data for this image.", TextToSpeech.QUEUE_ADD, null);
+        }
+
+
+
+    }
 }
