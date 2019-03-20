@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">COMP 7031 Assignment 2</string>
+    <string name="current_image">Current Image</string>
+    <string name="left">Left</string>
+    <string name="delete">Delete</string>
+    <string name="snap">Snap</string>
+    <string name="describe">Describe</string>
+    <string name="right">Right</string>
+    <string name="search">Search</string>
+    <string name="enter_a_caption">enter a caption</string>
+    <!--<string name="search_for_a_caption">Search for a caption</string>-->
+    <!--<string name="enter_start_date">Enter start date</string>-->
+    <!--<string name="enter_caption">enter_caption</string>-->
+    <string name="enter_end_date">enter end date</string>
+    <string name="enter_start_date_2">enter start date</string>
+    <string name="enter_tag">enter tag</string>
+    <string name="enter_longitude">enter longitude</string>
+    <string name="enter_anything">enter anything</string>
+    <string name="enter_latitude">enter latitude</string>
 </resources>

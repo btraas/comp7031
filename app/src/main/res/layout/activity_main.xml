@@ -15,6 +15,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/snap"
+
+        android:contentDescription="@string/current_image"
     />
 
     <Button
@@ -22,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="Left"
+        android:text="@string/left"
         app:layout_constraintStart_toStartOf="parent"
         />
 
@@ -31,7 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="Delete"
+        android:text="@string/delete"
         android:backgroundTint="@android:color/holo_red_dark"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/left"
@@ -44,7 +46,7 @@
         android:layout_height="wrap_content"
         android:onClick="snap"
 
-        android:text="Snap"
+        android:text="@string/snap"
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,7 +69,7 @@
         android:layout_height="wrap_content"
         android:onClick="auto"
 
-        android:text="Describe"
+        android:text="@string/describe"
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -78,7 +80,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:text="Right"
+        android:text="@string/right"
         app:layout_constraintEnd_toEndOf="parent"
         />
 
@@ -87,7 +89,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:text="Search"
+        android:text="@string/search"
         android:onClick="search"
 
         app:layout_constraintTop_toBottomOf="@id/right"
@@ -102,6 +104,9 @@
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/search"
+        android:hint="@string/enter_a_caption"
+        android:inputType="text"
+        android:autofillHints="false"
         android:id="@+id/caption" />
     <TextView
         android:layout_width="300dp"

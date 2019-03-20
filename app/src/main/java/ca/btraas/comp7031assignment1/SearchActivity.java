@@ -413,20 +413,20 @@ public class SearchActivity extends AppCompatActivity {
         sr = SpeechRecognizer.createSpeechRecognizer(this);
         sr.setRecognitionListener(new Listener());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            String requiredPermission = Manifest.permission.RECORD_AUDIO;
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        String requiredPermission = Manifest.permission.RECORD_AUDIO;
 
-            // If the user previously denied this permission then show a message explaining why
-            // this permission is needed
-            if (checkCallingOrSelfPermission(requiredPermission) == PackageManager.PERMISSION_DENIED) {
-                requestPermissions(new String[]{requiredPermission}, 101);
-            } else {
-                // automatically start listening
-                voice(null);
-            }
-
-
+        // If the user previously denied this permission then show a message explaining why
+        // this permission is needed
+        if (checkCallingOrSelfPermission(requiredPermission) == PackageManager.PERMISSION_DENIED) {
+            requestPermissions(new String[]{requiredPermission}, 101);
+        } else {
+            // automatically start listening
+            voice(null);
         }
+
+
+        //}
 
 
         // perform set on query text listener event

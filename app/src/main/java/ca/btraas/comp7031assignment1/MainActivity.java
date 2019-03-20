@@ -264,9 +264,9 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
             Log.w("MainActivity", "file not found!");
         } else {
             Date lastModDate = new Date(file.lastModified());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 timestampView.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(lastModDate));
-            }
+            //}
         }
         captionView.setText(library.getCaption( library.currentPath ));
 
